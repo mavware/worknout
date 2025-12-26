@@ -75,20 +75,52 @@ $finishWorkout = function (?string $finishOption = null) {
     $this->redirectRoute('dashboard', navigate: true);
 };
 
+$reorder = function (array $ids) {
+    foreach ($ids as $index => $id) {
+        Exercise::where('id', $id)->update(['sequence' => $index]);
+    }
+
+    $this->workout->load('exercises');
+};
+
+$removeExercise = function (int $exerciseId) {
+    Exercise::find($exerciseId)->delete();
+
+    $this->workout->load('exercises');
+};
+
 ?>
 
 <div class="max-w-2xl mx-auto p-6 space-y-8">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+
     <div class="flex items-center justify-between sticky top-0 z-10 bg-zinc-800">
         <flux:heading size="xl">{{ $workout->template->name ?? 'Workout' }}</flux:heading>
             <flux:modal.trigger name="finish-workout">
                 <flux:button variant="primary" size="sm">Finish</flux:button>
             </flux:modal.trigger>
     </div>
-    <div class="space-y-6">
+    <div
+        x-data
+        x-init="
+            new Sortable($el, {
+                handle: '.drag-handle',
+                animation: 150,
+                onEnd: (evt) => {
+                    let ids = Array.from($el.children).map(el => el.getAttribute('data-id'));
+                    $wire.reorder(ids);
+                }
+            });
+        "
+        class="space-y-6"
+    >
         @forelse($workout->exercises as $exercise)
-            <x-exercise-component :exercise="$exercise"/>
+            <div data-id="{{ $exercise->id }}" wire:key="exercise-{{ $exercise->id }}">
+                <x-exercise-component :exercise="$exercise"/>
+            </div>
         @empty
             <div
+                wire:key="no-exercises"
                 class="py-12 flex flex-col items-center justify-center border-2 border-dashed border-zinc-200 dark:border-white/10 rounded-2xl">
                 <flux:text>No exercises added yet.</flux:text>
             </div>

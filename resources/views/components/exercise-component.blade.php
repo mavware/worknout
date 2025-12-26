@@ -1,5 +1,19 @@
 <section class="p-4 bg-zinc-50 dark:bg-white/5 rounded-2xl border border-zinc-200 dark:border-white/10 space-y-4">
-    <flux:heading size="lg">{{ $exercise->movement->name }}</flux:heading>
+    <div class="flex items-center justify-between">
+        <flux:heading size="lg">{{ $exercise->movement->name }}</flux:heading>
+
+        <div class="flex items-center gap-2">
+            <flux:button variant="ghost" size="sm" icon="arrows-up-down" class="drag-handle cursor-grab" />
+
+            <flux:dropdown align="end">
+                <flux:button variant="ghost" size="sm" icon="ellipsis-horizontal" />
+
+                <flux:menu>
+                    <flux:menu.item wire:click="removeExercise({{ $exercise->id }})" icon="trash" variant="danger">Remove</flux:menu.item>
+                </flux:menu>
+            </flux:dropdown>
+        </div>
+    </div>
 
     <div class="space-y-2">
         @foreach($exercise->sets as $set)

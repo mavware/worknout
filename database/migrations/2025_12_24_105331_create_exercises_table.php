@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('movement_id');
             $table->integer('position')->default(0);
             $table->integer('sequence')->default(0);
+            $table->string('note', 255)->nullable();
             $table->timestamps();
         });
     }

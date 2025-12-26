@@ -18,6 +18,7 @@ class Exercise extends Model
         'movement_id',
         'position',
         'sequence',
+        'note',
     ];
 
     public function exercisable(): MorphTo
