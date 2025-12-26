@@ -9,6 +9,9 @@
                 <flux:button variant="ghost" size="sm" icon="ellipsis-horizontal" />
 
                 <flux:menu>
+                    <flux:menu.item wire:click="editNote({{ $exercise->id }})" icon="pencil-square">Add Note</flux:menu.item>
+                    <flux:menu.item wire:click="editNote({{ $exercise->id }}, true)" icon="bookmark">Add Sticky Note</flux:menu.item>
+                    <flux:menu.separator />
                     <flux:menu.item wire:click="removeExercise({{ $exercise->id }})" icon="trash" variant="danger">Remove</flux:menu.item>
                 </flux:menu>
             </flux:dropdown>
@@ -16,6 +19,14 @@
     </div>
 
     <div class="space-y-2">
+        @if($exercise->templateExercise()?->note)
+            <flux:text size="sm" class="italic">{{ $exercise->templateExercise()?->note }}</flux:text>
+        @endif
+
+        @if($exercise->note)
+            <flux:text size="sm" class="italic">{{ $exercise->note }}</flux:text>
+        @endif
+
         @foreach($exercise->sets as $set)
             <x-set-component :set="$set" :iteration="$loop->iteration" />
         @endforeach

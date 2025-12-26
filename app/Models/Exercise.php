@@ -35,4 +35,23 @@ class Exercise extends Model
     {
         return $this->hasMany(Set::class);
     }
+
+    public function templateExercise(): ?Exercise
+    {
+        if ($this->exercisable_type === Template::class) {
+            return null;
+        }
+
+        if (!$this->exercisable?->template)
+        {
+            return null;
+        }
+
+        return $this->exercisable
+            ?->template
+            ?->exercises
+            ->where('movement_id', $this->movement_id)
+            ->first();
+
+    }
 }

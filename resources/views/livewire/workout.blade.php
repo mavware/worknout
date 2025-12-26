@@ -5,12 +5,16 @@ use App\Models\Workout;
 use App\Models\Movement;
 use App\Models\Exercise;
 use App\Models\Set;
+use App\Models\Template;
 
 use function Livewire\Volt\{mount, state};
 
 state('workout');
 state(['movements' => fn() => Movement::all()]);
 state(['selectedMovements' => []]);
+state(['editingExercise' => null]);
+state(['isSticky' => false]);
+state(['note' => '']);
 
 mount(function (Workout $workout) {
     $workout->loadMissing('exercises');
@@ -87,6 +91,37 @@ $removeExercise = function (int $exerciseId) {
     Exercise::find($exerciseId)->delete();
 
     $this->workout->load('exercises');
+};
+
+$editNote = function (int $exerciseId, bool $sticky = false) {
+    $this->editingExercise = Exercise::find($exerciseId);
+    $this->isSticky = $sticky;
+    $this->note = $this->editingExercise->note ?? '';
+
+    $this->js("Flux.modal('edit-note').show()");
+};
+
+$saveNote = function () {
+    $this->editingExercise->update(['note' => $this->note]);
+
+    if ($this->isSticky && $this->workout->template_id) {
+        $templateExercise = Exercise::where('exercisable_type', Template::class)
+            ->where('exercisable_id', $this->workout->template_id)
+            ->where('movement_id', $this->editingExercise->movement_id)
+            ->first();
+
+        if ($templateExercise) {
+            $templateExercise->update(['note' => $this->note]);
+        }
+    }
+
+    $this->editingExercise = null;
+    $this->note = '';
+    $this->isSticky = false;
+
+    $this->workout->load('exercises');
+
+    $this->js("Flux.modal('edit-note').close()");
 };
 
 ?>
@@ -170,5 +205,24 @@ $removeExercise = function (int $exerciseId) {
                 <flux:button wire:click="finishWorkout('with-template')" variant="primary">Yes</flux:button>
             </div>
         </div>
+    </flux:modal>
+
+    <flux:modal name="edit-note" class="md:w-96">
+        <form wire:submit="saveNote" class="space-y-6">
+            <div>
+                <flux:heading size="lg">{{ $isSticky ? 'Add Sticky Note' : 'Add Note' }}</flux:heading>
+                <flux:text class="mt-2">{{ $isSticky ? 'This note will be added to the template as well.' : 'Add a note to this exercise.' }}</flux:text>
+            </div>
+
+            <flux:textarea wire:model="note" placeholder="Enter note..." />
+
+            <div class="flex">
+                <flux:modal.close>
+                    <flux:button variant="ghost">Cancel</flux:button>
+                </flux:modal.close>
+                <flux:spacer/>
+                <flux:button type="submit" variant="primary">Save Note</flux:button>
+            </div>
+        </form>
     </flux:modal>
 </div>
