@@ -36,4 +36,29 @@ class Workout extends Model implements CanHaveExercises
     {
         return $this->belongsTo(Template::class);
     }
+
+    public function createTemplate(): Template
+    {
+        $template = $this->user->templates()->create([
+            'name' => now()->format('M j, Y') . " Workout Template"
+        ]);
+
+        foreach ($this->exercises as $exercise) {
+            $newExercise = $template->exercises()->create([
+                'movement_id' => $exercise->movement_id,
+                'position'    => $exercise->position,
+            ]);
+
+            foreach ($exercise->sets as $set) {
+                $newExercise->sets()->create([
+                    'weight'   => $set->weight,
+                    'reps'     => $set->reps,
+                    'time'     => $set->time,
+                    'position' => $set->position,
+                ]);
+            }
+        }
+
+        return $template;
+    }
 }

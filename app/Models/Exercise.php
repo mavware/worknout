@@ -42,16 +42,14 @@ class Exercise extends Model
             return null;
         }
 
-        if (!$this->exercisable?->template)
-        {
+        $template = $this->exercisable?->template;
+
+        if (!$template) {
             return null;
         }
 
-        return $this->exercisable
-            ?->template
-            ?->exercises
+        return $template->exercises
             ->where('movement_id', $this->movement_id)
             ->first();
-
     }
 }
