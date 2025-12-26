@@ -1,11 +1,21 @@
 <?php
 
 use App\Models\Movement;
-use function Livewire\Volt\{state};
+use function Livewire\Volt\{state, computed};
 
 state(['workout']);
-state(['movements' => fn() => Movement::all()]);
+state(['search' => '']);
 state(['selectedMovements' => []]);
+
+$movements = computed(function () {
+    return Movement::query()
+        ->when($this->search, fn($query) => $query->where('name', 'like', '%' . $this->search . '%'))
+        ->get();
+});
+
+$existingMovementIds = computed(function () {
+    return $this->workout->exercises()->pluck('movement_id')->toArray();
+});
 
 $addExercises = function () {
     $this->workout->exercises()->createMany(
@@ -32,9 +42,15 @@ $addExercises = function () {
             <flux:text class="mt-2">Select the movements you want to add to your workout.</flux:text>
         </div>
 
-        <div class="space-y-2 max-h-64 overflow-y-auto">
-            @foreach($movements as $movement)
-                <flux:checkbox wire:model="selectedMovements" :value="$movement->id" :label="$movement->name"/>
+        <flux:input wire:model.live="search" icon="magnifying-glass" placeholder="Search movements..." />
+
+        <div class="space-y-2 h-64 overflow-y-auto">
+            @foreach($this->movements as $movement)
+                @if(in_array($movement->id, $this->existingMovementIds))
+                    <flux:checkbox checked disabled :label="$movement->name"/>
+                @else
+                    <flux:checkbox wire:model="selectedMovements" :value="$movement->id" :label="$movement->name"/>
+                @endif
             @endforeach
         </div>
 
