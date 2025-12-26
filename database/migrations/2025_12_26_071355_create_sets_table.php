@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('reps')->nullable();
             $table->integer('time')->nullable(); // in seconds
             $table->integer('position')->default(0);
+            $table->timestamp('completed_at')->nullable();
             $table->timestamps();
         });
     }

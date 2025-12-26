@@ -7,27 +7,11 @@ use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
 use App\Http\Controllers\WorkoutController;
 
-Route::get('/', function () {
-    return view('dashboard');
-})->name('home');
+Volt::route('/', 'dashboard')
+    ->middleware(['auth', 'verified'])
+    ->name('home');
 
-Route::prefix('workout')
-    ->name('workout.')
-    ->group(function () {
-    Route::get('/create', [WorkoutController::class, 'create'])->name('create');
-    Volt::route('/{workout}', 'workout')->name('edit');
-});
-
-Route::post('/templates', function (Request $request) {
-    $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'description' => 'nullable|string',
-    ]);
-
-    Template::create($validated);
-
-    return redirect()->route('dashboard');
-})->name('template.store');
+// Route for template store is now handled within the Volt component.
 
 
 
@@ -41,7 +25,7 @@ Route::post('/templates', function (Request $request) {
 //    Route::get('filament/email-verification/verify/{id}/{hash}', fn ($id, $hash) => redirect()->route('verification.verify', ['id' => $id, 'hash' => $hash]))->name('email-verification.verify');
 //});
 
-Route::view('dashboard', 'dashboard')
+Volt::route('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
@@ -62,4 +46,11 @@ Route::middleware(['auth'])->group(function () {
             ),
         )
         ->name('two-factor.show');
+
+    Route::prefix('workout')
+        ->name('workout.')
+        ->group(function () {
+            Route::get('/create', [WorkoutController::class, 'create'])->name('create');
+            Volt::route('/{workout}', 'workout')->name('edit');
+        });
 });

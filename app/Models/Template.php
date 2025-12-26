@@ -13,7 +13,7 @@ class Template extends Model implements CanHaveExercises
 {
     use HasExercises, HasFactory;
 
-    protected $fillable = ['name', 'description'];
+    protected $fillable = ['user_id', 'name', 'description'];
 
     protected $casts = [
         'routine' => RoutineCast::class,

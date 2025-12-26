@@ -13,6 +13,8 @@ trait HasExercises
 {
     public function exercises(): MorphMany
     {
-        return $this->morphMany(Exercise::class, 'exercisable');
+        return $this->morphMany(Exercise::class, 'exercisable')
+            ->orderBy('sequence')
+            ->orderBy('created_at');
     }
 }

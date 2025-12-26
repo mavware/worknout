@@ -16,6 +16,11 @@ class Set extends Model
         'reps',
         'time',
         'position',
+        'completed_at',
+    ];
+
+    protected $casts = [
+        'completed_at' => 'datetime',
     ];
 
     public function exercise(): BelongsTo

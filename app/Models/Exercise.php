@@ -12,7 +12,13 @@ class Exercise extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['exercisable_id', 'exercisable_type', 'movement_id', 'position'];
+    protected $fillable = [
+        'exercisable_id',
+        'exercisable_type',
+        'movement_id',
+        'position',
+        'sequence',
+    ];
 
     public function exercisable(): MorphTo
     {
