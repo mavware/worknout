@@ -22,7 +22,6 @@ class WorkoutFactory extends Factory
         return [
             'user_id' => User::factory(),
             'template_id' => Template::factory(),
-            'routine' => new Routine(),
             'started_at' => now(),
             'finished_at' => now()->addHour(),
         ];

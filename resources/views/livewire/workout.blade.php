@@ -75,9 +75,20 @@ $editNote = function (int $exerciseId, bool $sticky = false) {
 
     <div class="flex items-center justify-between sticky top-0 z-10 bg-zinc-800 py-2">
         <flux:heading size="xl">{{ $workout->template->name ?? 'Workout' }}</flux:heading>
-        <flux:modal.trigger name="finish-workout">
-            <flux:button variant="primary" size="sm">Finish</flux:button>
-        </flux:modal.trigger>
+
+        @if($workout->template)
+            @if($workout->matchesTemplate())
+                <flux:button wire:click="finishWorkout" variant="primary" size="sm">Finish</flux:button>
+            @else
+                <flux:modal.trigger name="finish-workout">
+                    <flux:button variant="primary" size="sm">Finish</flux:button>
+                </flux:modal.trigger>
+            @endif
+        @else
+            <flux:modal.trigger name="finish-workout">
+                <flux:button variant="primary" size="sm">Finish</flux:button>
+            </flux:modal.trigger>
+        @endif
     </div>
     <div
         x-data

@@ -43,10 +43,26 @@ class Workout extends Model implements CanHaveExercises
             'name' => now()->format('M j, Y') . " Workout Template"
         ]);
 
+        $this->updateTemplate($template);
+
+        return $template;
+    }
+
+    public function updateTemplate(?Template $template = null): void
+    {
+        $template ??= $this->template;
+
+        if (!$template) {
+            return;
+        }
+
+        $template->exercises()->delete();
+
         foreach ($this->exercises as $exercise) {
             $newExercise = $template->exercises()->create([
                 'movement_id' => $exercise->movement_id,
                 'position'    => $exercise->position,
+                'sequence'    => $exercise->sequence,
             ]);
 
             foreach ($exercise->sets as $set) {
@@ -58,7 +74,44 @@ class Workout extends Model implements CanHaveExercises
                 ]);
             }
         }
+    }
 
-        return $template;
+    public function matchesTemplate(): bool
+    {
+        if (!$this->template) {
+            return false;
+        }
+
+        $workoutExercises = $this->exercises->values();
+        $templateExercises = $this->template->exercises->values();
+
+        if ($workoutExercises->count() !== $templateExercises->count()) {
+            return false;
+        }
+
+        foreach ($workoutExercises as $index => $workoutExercise) {
+            $templateExercise = $templateExercises[$index];
+
+            if ($workoutExercise->movement_id !== $templateExercise->movement_id) {
+                return false;
+            }
+
+            $workoutSets = $workoutExercise->sets->values();
+            $templateSets = $templateExercise->sets->values();
+
+            if ($workoutSets->count() !== $templateSets->count()) {
+                return false;
+            }
+
+            foreach ($workoutSets as $setIndex => $workoutSet) {
+                $templateSet = $templateSets[$setIndex];
+
+                if ($workoutSet->weight != $templateSet->weight || $workoutSet->reps != $templateSet->reps) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }
