@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\User;
-use App\Models\Template;
 
 use function Livewire\Volt\{mount, state};
 
@@ -53,19 +52,22 @@ $createTemplate = function () {
 
                 <flux:text class="line-clamp-3">
                     {{ $template->description }}
+                    @foreach($template->exercises->take(5) as $exercise)
+                        <div class="text-sm font-medium text-gray-400 dark:text-gray-300 px-3">
+                            {{ $exercise->sets->count() }} X {{ $exercise->movement->name }}
+                        </div>
+                            @endforeach
                 </flux:text>
             </a>
         @empty
         @endforelse
-        <div class="relative aspect-video overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
-            <x-placeholder-pattern class="absolute inset-0 size-full stroke-gray-900/20 dark:stroke-neutral-100/20"/>
-        </div>
-        <div class="relative aspect-video overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
-            <x-placeholder-pattern class="absolute inset-0 size-full stroke-gray-900/20 dark:stroke-neutral-100/20"/>
-        </div>
-        <div class="relative aspect-video overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
-            <x-placeholder-pattern class="absolute inset-0 size-full stroke-gray-900/20 dark:stroke-neutral-100/20"/>
-        </div>
+
+        @for($x = $this->templates->count() % 3; $x <= 2; $x++)
+            <div class="relative aspect-video overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
+                <x-placeholder-pattern class="absolute inset-0 size-full stroke-gray-900/20 dark:stroke-neutral-100/20"/>
+            </div>
+        @endfor
+
     </div>
     <div class="relative h-full flex-1 overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
         <x-placeholder-pattern class="absolute inset-0 size-full stroke-gray-900/20 dark:stroke-neutral-100/20"/>
