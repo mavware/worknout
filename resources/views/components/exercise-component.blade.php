@@ -2,17 +2,23 @@
     <div class="flex items-center justify-between">
         <flux:heading size="lg">{{ $exercise->movement->name }}</flux:heading>
 
+        <livewire:exercise-sparkline :exercises="$previousExercises->where('movement_id', $exercise->movement_id)" />
+
         <div class="flex items-center gap-2">
-            <flux:button variant="ghost" size="sm" icon="arrows-up-down" class="drag-handle cursor-grab" />
+            <flux:button variant="ghost" size="sm" icon="arrows-up-down" class="drag-handle cursor-grab"/>
 
             <flux:dropdown align="end">
-                <flux:button variant="ghost" size="sm" icon="ellipsis-horizontal" />
+                <flux:button variant="ghost" size="sm" icon="ellipsis-horizontal"/>
 
                 <flux:menu>
-                    <flux:menu.item wire:click="editNote({{ $exercise->id }})" icon="pencil-square">Add Note</flux:menu.item>
-                    <flux:menu.item wire:click="editNote({{ $exercise->id }}, true)" icon="bookmark">Add Sticky Note</flux:menu.item>
-                    <flux:menu.separator />
-                    <flux:menu.item wire:click="removeExercise({{ $exercise->id }})" icon="trash" variant="danger">Remove</flux:menu.item>
+                    <flux:menu.item wire:click="editNote({{ $exercise->id }})" icon="pencil-square">Add Note
+                    </flux:menu.item>
+                    <flux:menu.item wire:click="editNote({{ $exercise->id }}, true)" icon="bookmark">Add Sticky Note
+                    </flux:menu.item>
+                    <flux:menu.separator/>
+                    <flux:menu.item wire:click="removeExercise({{ $exercise->id }})" icon="trash" variant="danger">
+                        Remove Exercise
+                    </flux:menu.item>
                 </flux:menu>
             </flux:dropdown>
         </div>
@@ -27,10 +33,19 @@
             <flux:text size="sm" class="italic">{{ $exercise->note }}</flux:text>
         @endif
 
+        <div class="flex justify-between gap-4">
+            <flux:text weight="medium">Set</flux:text>
+            <flux:text size="sm">Weight</flux:text>
+            <flux:text size="sm">Reps</flux:text>
+            <flux:text size="sm"></flux:text>
+        </div>
+
         @foreach($exercise->sets as $set)
-            <x-set-component :set="$set" :iteration="$loop->iteration" />
+            <x-set-component :set="$set" :iteration="$loop->iteration"/>
         @endforeach
     </div>
 
-    <flux:button wire:click="addSet({{ $exercise->id }})" variant="ghost" icon="plus" size="sm" class="cursor-pointer" tabindex="-1">Add New Set</flux:button>
+    <flux:button wire:click="addSet({{ $exercise->id }})" variant="ghost" icon="plus" size="sm" class="cursor-pointer"
+                 tabindex="-1">Add New Set
+    </flux:button>
 </section>

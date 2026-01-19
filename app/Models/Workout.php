@@ -4,7 +4,9 @@ namespace App\Models;
 
 use App\Casts\RoutineCast;
 use App\Trait\HasExercises;
+use Illuminate\Support\Collection;
 use App\Contracts\CanHaveExercises;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -113,5 +115,24 @@ class Workout extends Model implements CanHaveExercises
         }
 
         return true;
+    }
+
+    public function scopeWhereBefore(Builder $query, Workout $workout): Builder
+    {
+        return $query->where('id', '<', $workout->id);
+    }
+
+    public function previousExercises(): Collection
+    {
+        return $this->user
+            ->workouts()
+            ->with('exercises.sets')
+            ->where('template_id', $this->template_id ?? '')
+            ->whereBefore($this)
+            ->latest()
+            ->take(5)
+            ->get()
+            ->pluck('exercises')
+            ->flatten();
     }
 }

@@ -6,10 +6,11 @@ use App\Models\Set;
 
 use function Livewire\Volt\{mount, state, on};
 
-state('workout');
+state('workout', 'previousWorkouts');
 
 mount(function (Workout $workout) {
-    $workout->loadMissing(['exercises.movement', 'exercises.sets', 'template.exercises']);
+    $workout->loadMissing(['user', 'exercises.movement', 'exercises.sets', 'template.exercises']);
+    $this->previousExercises = $workout->previousExercises();
 });
 
 on([
@@ -68,27 +69,27 @@ $editNote = function (int $exerciseId, bool $sticky = false) {
     $this->dispatch('edit-note', exerciseId: $exerciseId, sticky: $sticky)->to('workout.edit-note');
 };
 
+$cancelWorkout = function () {
+    $this->workout->delete();
+
+    $this->redirectRoute('dashboard', navigate: true);
+};
+
 ?>
 
 <div class="max-w-2xl mx-auto p-6 space-y-8">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 
-    <div class="flex items-center justify-between sticky top-0 z-10 bg-zinc-800 py-2">
+    <div class="flex items-center justify-between top-0 z-10 bg-zinc-800 py-2">
         <flux:heading size="xl">{{ $workout->template->name ?? 'Workout' }}</flux:heading>
 
-        @if($workout->template)
-            @if($workout->matchesTemplate())
-                <flux:button wire:click="finishWorkout" variant="primary" size="sm">Finish</flux:button>
-            @else
-                <flux:modal.trigger name="finish-workout">
-                    <flux:button variant="primary" size="sm">Finish</flux:button>
-                </flux:modal.trigger>
-            @endif
-        @else
-            <flux:modal.trigger name="finish-workout">
-                <flux:button variant="primary" size="sm">Finish</flux:button>
-            </flux:modal.trigger>
-        @endif
+        <flux:dropdown align="end">
+            <flux:button variant="ghost" size="sm" icon="ellipsis-horizontal"/>
+
+            <flux:menu>
+                <flux:menu.item wire:click="cancelWorkout" icon="trash" variant="danger">Cancel Workout</flux:menu.item>
+            </flux:menu>
+        </flux:dropdown>
     </div>
     <div
         x-data
@@ -106,7 +107,7 @@ $editNote = function (int $exerciseId, bool $sticky = false) {
     >
         @forelse($workout->exercises as $exercise)
             <div data-id="{{ $exercise->id }}" wire:key="exercise-{{ $exercise->id }}">
-                <x-exercise-component :exercise="$exercise"/>
+                <x-exercise-component :exercise="$exercise" :previousExercises="$this->previousExercises"/>
             </div>
         @empty
             <div
@@ -117,9 +118,27 @@ $editNote = function (int $exerciseId, bool $sticky = false) {
         @endforelse
     </div>
 
-    <flux:modal.trigger name="new-exercise">
-        <flux:button tabindex="-1">Add New Exercise</flux:button>
-    </flux:modal.trigger>
+    <div class="flex flex-col space-y-4">
+        <flux:modal.trigger name="new-exercise">
+            <flux:button tabindex="-1" class="w-full">Add New Exercise</flux:button>
+        </flux:modal.trigger>
+    </div>
+
+    <div class="flex flex-col space-y-4">
+        @if($workout->template)
+            @if($workout->matchesTemplate())
+                <flux:button wire:click="finishWorkout" variant="primary" color="emerald" class="w-full">Finish Workout</flux:button>
+            @else
+                <flux:modal.trigger name="finish-workout">
+                    <flux:button variant="primary" color="emerald" class="w-full">Finish Workout</flux:button>
+                </flux:modal.trigger>
+            @endif
+        @else
+            <flux:modal.trigger name="finish-workout">
+                <flux:button variant="primary" color="emerald" class="w-full">Finish Workout</flux:button>
+            </flux:modal.trigger>
+        @endif
+    </div>
 
     <livewire:workout.add-exercises :$workout />
 

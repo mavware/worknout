@@ -35,42 +35,10 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        foreach($this->movements() as $movement){
+        $movements = json_decode(file_get_contents(database_path('data/movements.json')), true);
+
+        foreach($movements as $movement){
             Movement::create(['name' => $movement]);
         }
-    }
-
-    private function movements(): array
-    {
-        return [
-            'Ab Wheel',
-            'Aerobics',
-            'Arnold Press',
-            'Around the World',
-            'Back Extension',
-            'Back Extension (Machine)',
-            'Ball Slams',
-            'Battle Ropes',
-            'Bench Dip',
-            'Bench Press (Barbell)',
-            'Bench Press (Cable)',
-            'Bench Press (Smith Machine)',
-            'Bench Press - Close Grip (Barbell)',
-            'Bench Press - Wide Grip (Barbell)',
-            'Bent Over One Arm Row (Dumbbell)',
-            'Bent Over Row (Band)',
-            'Bent Over Row (Barbell)',
-            'Bent Over Row (Dumbbell)',
-            'Bent Over Row - Underhand (Barbell)',
-            'Bicep Curl (Barbell)',
-            'Bicep Curl (Cable)',
-            'Bicep Curl (Dumbbell)',
-            'Bicep Curl (Machine)',
-            'Bicycle Crunch',
-            'Box Jump',
-            'Box Squat (Barbell)',
-            'Bulgarian Split Squat',
-            'Burpee',
-        ];
     }
 }
